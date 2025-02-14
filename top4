@@ -104,7 +104,7 @@ local function toggleAutoParry(Value)
 end
 
 local AutoParryToggle = Tabs.Main:AddToggle("AutoParryToggle", {
-    Title = "Enable Auto Parry,
+    Title = "Enable Auto Parry",
     Default = false,
     Callback = toggleAutoParry
 })
@@ -122,7 +122,7 @@ local function toggleAutoParry(Value)
 end
 
 local ASCtoggle = Tabs.Main:AddToggle("AutoSelfConfidenceToggle", {
-    Title = "Enable Auto Self Confidence,
+    Title = "Enable Auto Self Confidence",
     Default = false,
     Callback = ASC
 })
