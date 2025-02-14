@@ -1,0 +1,289 @@
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualUser = game:GetService("VirtualUser")
+local RunService = game:GetService("RunService")
+local remotes = ReplicatedStorage:WaitForChild("Remotes")
+local changedAfkMode = remotes:WaitForChild("ChangedAfkMode")
+local workspace = game:GetService("Workspace")
+
+local Player = Players.LocalPlayer
+
+local Window = Fluent:CreateWindow({
+    Title = "BB private script by ",
+    SubTitle = "sunflower and olurgs",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+local Options = Fluent.Options
+
+Fluent:Notify({
+    Title = "Notification",
+    Content = "This is a notification",
+    SubContent = "SubContent",
+    Duration = 5
+})
+
+Tabs.Main:AddButton({
+    Title = "Ronix Hub",
+    Description = "AP",
+    Callback = function()
+        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/79ab2d3174641622d317f9e234797acb.lua"))()
+    end
+})
+
+
+
+local AutoAFKDropdown = Tabs.Main:AddDropdown("AutoAFKDropdown", {
+    Title = "Auto AFK when players >",
+    Values = {"4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"},
+    Multi = false,
+    Default = "4",
+})
+
+AutoAFKDropdown:OnChanged(function(Value)
+    print("Auto AFK threshold set to:", Value)
+end)
+
+AutoAFKDropdown:SetValue("4")
+
+local isCheckingPlayerCount = false -- Flag to check if the loop is running
+
+local function checkPlayerCount()
+    while isCheckingPlayerCount do
+        local playerCount = #Players:GetPlayers()
+        local threshold = tonumber(Options.AutoAFKDropdown.Value) or 4
+
+        if playerCount > threshold then
+            changedAfkMode:FireServer(true)
+        else
+            changedAfkMode:FireServer(false)
+        end
+
+        wait(1)
+    end
+end
+
+-- Auto AFK Toggle
+local AutoAFKEnabled = false
+local function toggleAutoAFK(Value)
+    AutoAFKEnabled = Value
+    if AutoAFKEnabled then
+        isCheckingPlayerCount = true
+        spawn(checkPlayerCount)  -- Start checking player count when enabled
+    else
+        isCheckingPlayerCount = false  -- Stop checking player count when disabled
+    end
+end
+
+local AutoAFKToggle = Tabs.Main:AddToggle("AutoAFKToggle", {
+    Title = "Enable Auto AFK",
+    Default = false,
+    Callback = toggleAutoAFK
+})
+
+-- AutoParry Toggle
+local AutoParryEnabled = false
+local function toggleAutoParry(Value)
+    AutoParryEnabled = Value
+    if AutoParryEnabled then
+        loadstring(game.HttpGet("https://raw.githubusercontent.com/hcwdp/43tg3ggr/refs/heads/main/a?token=GHSAT0AAAAAAC67GZVKFMUQNO54N666JWBAZ5PXRRA"))()
+    end
+end
+
+local AutoParryToggle = Tabs.Main:AddToggle("AutoParryToggle", {
+    Title = "Enable Auto Parry,
+    Default = false,
+    Callback = toggleAutoParry
+})
+
+-- AutoSelfConfidence Toggle
+local ASCenabled = false
+local function toggleAutoParry(Value)
+    ASCenabled = Value
+    if ASCenabled then
+        while true do 
+			wait(0.1)
+			game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PlrConfidenceTaunted"):FireServer()
+		end
+    end
+end
+
+local ASCtoggle = Tabs.Main:AddToggle("AutoSelfConfidenceToggle", {
+    Title = "Enable Auto Self Confidence,
+    Default = false,
+    Callback = ASC
+})
+
+-- Anti-AFK Toggle
+local AntiAFKEnabled = false
+local function antiAfkLoop()
+    while AntiAFKEnabled do
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+        wait(300) -- Prevents Roblox from kicking for 20 minutes of inactivity
+    end
+end
+
+local AntiAFKToggle = Tabs.Main:AddToggle("AntiAFKToggle", {
+    Title = "Anti-AFK",
+    Default = false,
+    Callback = function(Value)
+        AntiAFKEnabled = Value
+        if AntiAFKEnabled then
+            spawn(antiAfkLoop)
+        end
+    end
+})
+
+-- AutoVote Toggle
+local AutoVoteEnabled = false
+local function autoVoteLoop()
+    while AutoVoteEnabled do
+        wait()
+        local args = {
+            [1] = "2Teams"
+        }
+
+        game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_net@0.1.0"):WaitForChild("net"):WaitForChild("RE/UpdateVotes"):FireServer(unpack(args))
+    end
+end
+
+local AutoVoteToggle = Tabs.Main:AddToggle("AutoVoteToggle", {
+    Title = "AutoVote",
+    Default = false,
+    Callback = function(Value)
+        AutoVoteEnabled = Value
+        if AutoVoteEnabled then
+            spawn(autoVoteLoop)
+        end
+    end
+})
+
+-- AutoTP Ball Toggle
+local AutoTPBallEnabled = false
+
+local function GetBall()
+    for _, Ball in ipairs(workspace.Balls:GetChildren()) do
+        if Ball:GetAttribute("realBall") then
+            return Ball
+        end
+    end
+end
+
+local function autoTeleportBall()
+    while AutoTPBallEnabled do
+        wait()
+        local Ball = GetBall()
+        local HRP = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+
+        if Ball and HRP then
+            -- Teleport to the ball
+            HRP.CFrame = CFrame.new(Ball.Position + Vector3.new(0, 5, 0))  -- Slightly above the ball to avoid being in it
+        end
+    end
+end
+
+local AutoTPBallToggle = Tabs.Main:AddToggle("AutoTPBallToggle", {
+    Title = "AutoTP Ball",
+    Default = false,
+    Callback = function(Value)
+        AutoTPBallEnabled = Value
+        if AutoTPBallEnabled then
+            spawn(autoTeleportBall)
+        end
+    end
+})
+
+local Dropdown = Tabs.Main:AddDropdown("PlayerDropdown", {
+    Title = "Select Player",
+    Values = {},  -- We will populate this dynamically with player names
+    Multi = false,
+    Default = 1,  -- Default player selection
+})
+
+-- Populate the dropdown with player names
+local function PopulatePlayerDropdown()
+    local playerNames = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        table.insert(playerNames, player.Name)
+    end
+    Dropdown:SetValues(playerNames)  -- Update dropdown with player names
+end
+
+-- Function to check a specific player's AFK indicator
+local function CheckSpecificPlayerAFKIndicator(playerName)
+    -- Access the player's AFKIndicator inside the workspace.Dead folder
+    local player = Players:FindFirstChild(playerName)
+    if not player then
+        print("Player not found.")
+        return
+    end
+
+
+local AFKIndicator = workspace:FindFirstChild("Dead") and workspace.Dead:FindFirstChild(player.Name) and workspace.Dead[player.Name]:FindFirstChild("AFKIndicator")
+
+    if AFKIndicator then
+        if AFKIndicator.Enabled then
+            print(player.Name .. " AFK Indicator: Enabled")
+
+            local args = { [1] = true }
+            ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangedAfkMode"):FireServer(unpack(args))
+        else
+           print(player.Name .. " AFK Indicator: Disabled")
+
+            local args = { [1] = false }
+            ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangedAfkMode"):FireServer(unpack(args))
+        end
+    else
+        print(player.Name .. " does not have an AFKIndicator.")
+
+        local args = { [1] = false }
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangedAfkMode"):FireServer(unpack(args))
+    end
+end
+
+-- Populate the dropdown when the script runs
+PopulatePlayerDropdown()
+
+-- Dropdown change handler to check selected player's AFK status
+Dropdown:OnChanged(function(selectedPlayer)
+    print("Selected player:", selectedPlayer)
+    -- Check AFK status for the selected player
+    while true do
+        CheckSpecificPlayerAFKIndicator(selectedPlayer)
+        wait(3)  -- Check every 3 seconds, adjust as needed
+    end
+end)
+
+
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:SetFolder("FluentScriptHub")
+SaveManager:SetFolder("FluentScriptHub/specific-game")
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+
+Fluent:Notify({
+    Title = "Fluent",
+    Content = "The script has been loaded.",
+    Duration = 8
+})
+
+SaveManager:LoadAutoloadConfig()
